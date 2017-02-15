@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">HG果冻</string>
+
+    <string name="connecting">连接中</string>
+    <string name="connected">已连接</string>
+    <string name="disconnected">连接已断开</string>
+    <string name="check_upgrade">检查更新</string>
+    <string name="upgrade_script">更新脚本</string>
+    <string name="clean_cache">清理缓存</string>
+    <string name="browser">微信浏览器</string>
+    <string name="vpn_setting">VPN设置</string>
+    <string name="sign_account">登记账号</string>
+    <string name="uninstall_apk">一键卸载</string>
+    <string name="download_apk">下载必备资源</string>
+    <string name="download_phone_data">下载手机数据</string>
+    <string name="downloading_text">下载资源中</string>
+    <string name="check_all">全选</string>
+    <string name="download">下载</string>
+    <string name="home_page">请输入网址</string>
+    <string name="visit_url">打开</string>
+</resources>
