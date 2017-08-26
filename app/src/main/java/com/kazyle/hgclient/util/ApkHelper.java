@@ -2,10 +2,16 @@ package com.kazyle.hgclient.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by Kazyle on 2016/9/4.
@@ -136,5 +142,4 @@ public class ApkHelper {
     private static boolean returnResult(int value){
         return value == 0;
     }
-
 }

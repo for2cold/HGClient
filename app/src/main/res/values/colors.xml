@@ -6,4 +6,7 @@
     <color name="transparent">#00000000</color>
     <color name="black">#000000</color>
     <color name="green">#2cc47a</color>
+    <color name="info">#5bc0de</color>
+    <color name="success">#449d44</color>
+    <color name="primary">#286090</color>
 </resources>

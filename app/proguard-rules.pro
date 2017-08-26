@@ -15,3 +15,46 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-optimizationpasses 5
+
+-dontusemixedcaseclassnames
+
+-dontskipnonpubliclibraryclasses
+
+-dontoptimize
+
+-dontpreverify
+
+-verbose
+
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+-keepattributes Signature,*Annotation*
+-keep public class org.xutils.** {
+    public protected *;
+}
+-keep public interface org.xutils.** {
+    public protected *;
+}
+-keepclassmembers class * extends org.xutils.** {
+    public protected *;
+}
+-keepclassmembers @org.xutils.db.annotation.* class * {*;}
+-keepclassmembers @org.xutils.http.annotation.* class * {*;}
+-keepclassmembers class * {
+    @org.xutils.view.annotation.Event <methods>;
+}
+
+-keep public class * extends android.support.v4.**
+-keep public class * extends android.support.v7.**
+-keep public class * extends android.support.annotation.**
+
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.alibaba.fastjson.**{*;}
+-keep class * implements java.io.Serializable { *; }
+-dontwarn com.alibaba.fastjson.**
+
+-keep class com.tencent.** {*;}
+-keep class im.fir.sdk.** {*;}
+-keep class dalvik.system.** {*;}

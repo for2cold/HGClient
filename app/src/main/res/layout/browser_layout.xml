@@ -13,15 +13,31 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:scrollHorizontally="true"
-            android:layout_weight="9"
+            android:layout_weight="7"
             android:inputType="textUri"
+            android:focusable="false"
             android:hint="@string/home_page" />
+        <Button
+            android:id="@+id/getUrlBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColor="@color/primary"
+            android:text="@string/get_url"/>
         <Button
             android:id="@+id/visitUrlBtn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textColor="@color/info"
             android:text="@string/visit_url"/>
+        <Button
+            android:id="@+id/collapse"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColor="@color/success"
+            android:text="@string/collapse"/>
     </LinearLayout>
 
     <com.tencent.smtt.sdk.WebView

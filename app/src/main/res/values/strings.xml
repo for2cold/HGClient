@@ -17,5 +17,7 @@
     <string name="check_all">全选</string>
     <string name="download">下载</string>
     <string name="home_page">请输入网址</string>
-    <string name="visit_url">打开</string>
+    <string name="get_url">获取</string>
+    <string name="visit_url">访问</string>
+    <string name="collapse">展开</string>
 </resources>

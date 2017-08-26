@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -22,7 +21,6 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-//import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.alibaba.fastjson.JSONObject;
 import com.kazyle.hgclient.callback.RequestCallback;
 import com.kazyle.hgclient.callback.data.ResponseCode;
@@ -33,8 +31,8 @@ import com.kazyle.hgclient.entity.FirVersion;
 import com.kazyle.hgclient.entity.Script;
 import com.kazyle.hgclient.entity.ScriptType;
 import com.kazyle.hgclient.exception.ClearAppDataException;
-import com.kazyle.hgclient.util.FileUtils;
 import com.kazyle.hgclient.util.AppHelper;
+import com.kazyle.hgclient.util.FileUtils;
 import com.kazyle.hgclient.util.XUtils;
 import com.kazyle.hgclient.widget.HGProgressBar;
 
@@ -56,17 +54,13 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import im.fir.sdk.FIR;
 import im.fir.sdk.VersionCheckCallback;
 
+//import com.beardedhen.androidbootstrap.TypefaceProvider;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "[HGHleper]";
 
-    private String userId = "3";
-    private static final String API_URL = "http://112.74.129.247:9091";
-//    private static final String API_URL = "http://192.168.0.101:8080/hgserver";
-    private static final String FIR_API_TOKEN = "950223d3b9437f2ea5059923d2a8dfce";
-    private static String TOUCHSPRITE_PATH = Environment.getExternalStorageDirectory().getPath() + "/TouchSprite";
-    private static String TOUCHELPER_PATH = Environment.getExternalStorageDirectory().getPath() + "/Touchelper";
-    private static String HGHELPER_PACKAGE = "/sdcard/TouchHGHelper";
+
 
     private static final int SCRIPT_MSG = 1;
     private static final int PHONEDATA_MSG = 2;
@@ -92,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     DbManager.DaoConfig dbConfig = new DbManager.DaoConfig()
-            .setDbDir(new File(HGHELPER_PACKAGE + "/db"))
+            .setDbDir(new File(AppHelper.HGHELPER_PACKAGE + "/db"))
             .setDbName("hg_helper.db")
             .setDbVersion(1)
             .setDbOpenListener(new DbManager.DbOpenListener() {
@@ -122,6 +116,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         browserBtn.setOnClickListener(this);
         handler = new EventHandler();
         AppHelper.getRoot();
+        init();
+    }
+
+    private void init() {
+        File file = new File(AppHelper.HGHELPER_PACKAGE + "/dl");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        File file2 = new File(AppHelper.HGHELPER_PACKAGE + "/db");
+        if (!file2.exists()) {
+            file2.mkdirs();
+        }
     }
 
     @Override
@@ -155,9 +161,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void chooseApkForDownload() {
-        String url = API_URL + "/api/apk/list";
+        String signature = AppHelper.signature(AppHelper.signature(this));
+        String url = AppHelper.API_URL + "/api/apk/list";
         Map<String, String> params = new HashMap<>();
-        params.put("userId", userId);
+        params.put("userId", AppHelper.USER_ID);
+        params.put("signature", signature);
         // 获取APK列表
         XUtils.Get(url, params, new RequestCallback<ResponseEntity>() {
 
@@ -247,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void checkUpgrade() {
         // FIR检查更新
-        FIR.checkForUpdateInFIR(FIR_API_TOKEN, new VersionCheckCallback() {
+        FIR.checkForUpdateInFIR(AppHelper.FIR_API_TOKEN, new VersionCheckCallback() {
             @Override
             public void onSuccess(String versionJson) {
                 Log.i("fir","check from fir.im success! " + "\n" + versionJson);
@@ -270,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     @Override
                                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                                         sweetAlertDialog.dismissWithAnimation();
-                                        String path = HGHELPER_PACKAGE + "/dl/" + version.getName() + "_V" + version.getVersionShort() + ".apk";
+                                        String path = AppHelper.HGHELPER_PACKAGE + "/dl/" + version.getName() + "_V" + version.getVersionShort() + ".apk";
                                         XUtils.DownLoadFile(version.getInstallUrl(), path, new RequestCallback<File>() {
 
                                             @Override
@@ -334,10 +342,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 更新脚本
      */
     private void upgradeScript() {
-        /*long userId = sharedPreferences.getLong("userId", 0);
-        if (userId == 0) {
-            // 请先登录
-        }*/
+        String signature = AppHelper.signature(AppHelper.signature(this));
         final DbManager db = x.getDb(dbConfig);
         // 获取已有的脚本ID
         String scriptIds = "";
@@ -354,10 +359,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
 
-        String url = API_URL + "/api/script/upgrade";
+        String url = AppHelper.API_URL + "/api/script/upgrade";
         Map<String, String> params = new HashMap<>();
-        params.put("userId", userId);
+        params.put("userId", AppHelper.USER_ID);
         params.put("scriptIds", scriptIds);
+        params.put("signature", signature);
         XUtils.Get(url, params, new RequestCallback<ResponseEntity>() {
 
             @Override
@@ -409,13 +415,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 下载008数据
      */
     private void getPhonedata() {
-        /*long userId = sharedPreferences.getLong("userId", 0);
-        if (userId == 0) {
-            // 请先登录
-        }*/
-        String url = API_URL + "/api/phonedata/get";
+        String signature = AppHelper.signature(AppHelper.signature(this));
+        String url = AppHelper.API_URL + "/api/phonedata/get";
         Map<String, String> params = new HashMap<>();
-        params.put("userId", userId);
+        params.put("userId", AppHelper.USER_ID);
+        params.put("signature", signature);
         XUtils.Get(url, params, new RequestCallback<ResponseEntity>() {
 
             @Override
@@ -459,9 +463,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 下载初始化APK
      */
     private void getInitApk() {
-        String url = API_URL + "/api/apk/init";
+        String url = AppHelper.API_URL + "/api/apk/init";
         Map<String, String> params = new HashMap<>();
-        params.put("userId", userId);
+        params.put("userId", AppHelper.USER_ID);
         XUtils.Get(url, params, new RequestCallback<ResponseEntity>() {
 
             @Override
@@ -525,9 +529,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             final Script oldpojo = db.selector(Script.class).where("key", "=", pojo.getKey()).findFirst();
                             String path = null;
                             if (pojo.getType() == ScriptType.TouchSprite) {
-                                path = TOUCHSPRITE_PATH + "/lua/";
+                                path = AppHelper.TOUCHSPRITE_PATH + "/lua/";
                             } else if (pojo.getType() == ScriptType.Touchelper) {
-                                path = TOUCHELPER_PATH + "/scripts/v2/";
+                                path = AppHelper.TOUCHELPER_PATH + "/scripts/v2/";
                             }
                             File root = new File(path);
                             if (!root.exists()) {
@@ -563,12 +567,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case PHONEDATA_MSG: // 下载手机数据
                     url = (String) msg.obj;
-                    path = TOUCHSPRITE_PATH + "/res/008.zip";
+                    path = AppHelper.TOUCHSPRITE_PATH + "/res/008.zip";
                     XUtils.DownLoadFile(url, path, new RequestCallback<File>() {
                         @Override
                         public void onSuccess(File result) {
                             // 解压文件
-                            String target = TOUCHSPRITE_PATH + "/res/data/";;
+                            String target = AppHelper.TOUCHSPRITE_PATH + "/res/data/";;
                             File file = new File(target);
                             if (!file.exists()) {
                                 file.mkdirs();
@@ -586,7 +590,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case INIT_APK: // 下载安装初始化APK
                     url = (String) msg.obj;
-                    path = HGHELPER_PACKAGE + "/dl/initapk.zip";
+                    path = AppHelper.HGHELPER_PACKAGE + "/dl/initapk.zip";
                     XUtils.DownLoadFile(url, path, new RequestCallback<File>() {
 
                         @Override
@@ -616,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         @Override
                         public void onSuccess(File result) {
                             // 解压文件
-                            final String target = HGHELPER_PACKAGE + "/dl/";
+                            final String target = AppHelper.HGHELPER_PACKAGE + "/dl/";
                             final File file = new File(target);
                             if (!file.exists()) {
                                 file.mkdirs();
@@ -627,48 +631,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 successDialog = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE);
                                 successDialog.setTitleText("下载成功！")
                                         .setContentText("存放路径：" + target).show();
-                                // 安装APK
-                                /*new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
-                                        .setTitleText("是否自动安装所下载的应用?")
-                                        .setCancelText("否")
-                                        .setConfirmText("好")
-                                        .showCancelButton(true)
-                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                            @Override
-                                            public void onClick(SweetAlertDialog sDialog) {
-                                                sDialog.dismissWithAnimation();
-                                                // 安装APK
-                                                loading = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.PROGRESS_TYPE);
-                                                loading.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-                                                loading.setTitleText("正在安装，请稍后");
-                                                loading.show();
-                                                int installSuccess = 0;
-                                                boolean result = false;
-                                                File[] apks = file.listFiles();
-                                                for (File apk : apks) {
-                                                    Log.d(TAG, "apk path--->" + apk.getPath());
-                                                    result = ApkHelper.install(apk.getPath(), MainActivity.this);
-                                                    if (result) {
-                                                        installSuccess++;
-                                                    }
-                                                }
-                                                boolean installStatus = true;
-                                                if (apks.length > 0) {
-                                                    if (installSuccess == 0) {
-                                                        installStatus = false;
-                                                    }
-                                                }
-                                                loading.dismiss();
-                                                if (installStatus) {
-                                                    successDialog = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE);
-                                                    successDialog.setTitleText("已成功安装" + installSuccess + "个应用").show();
-                                                } else {
-                                                    errorDialog = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE);
-                                                    errorDialog.setTitleText("安装失败").show();
-                                                }
-                                            }
-                                        })
-                                        .show();*/
                             }
                         }
                     });
